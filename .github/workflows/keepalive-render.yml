@@ -3,7 +3,7 @@ name: Keepalive Render (cron)
 
 on:
   schedule:
-    - cron: "*/10 * * * *"  # ogni 10 minuti (minimo)
+    - cron: "*/5 * * * *"  # ogni 5 minuti (minimo)
   workflow_dispatch:
 
 permissions:
