@@ -1,9 +1,8 @@
-
 name: Keepalive Render (cron)
 
 on:
   schedule:
-    - cron: "*/5 * * * *"  # ogni 5 minuti (minimo)
+    - cron: "*/5 * * * *"  # ogni 10 minuti (UTC)
   workflow_dispatch:
 
 permissions:
@@ -18,16 +17,25 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
-      - name: Ping Render URL
+      - name: Ping Render URL (no-cache + token)
         env:
-          KEEPALIVE_URL: ${{ secrets.KEEPALIVE_URL }}
+          KEEPALIVE_URL: ${{ secrets.KEEPALIVE_URL }}   # es: https://djshoprigenerato.onrender.com/_keepalive
+          KEEPALIVE_TOKEN: ${{ secrets.KEEPALIVE_TOKEN }} # lo stesso impostato su Render
         run: |
           if [ -z "$KEEPALIVE_URL" ]; then
             echo "::error ::Missing secret KEEPALIVE_URL"; exit 1
           fi
-          echo "Pinging: $KEEPALIVE_URL"
+          TS=$(date +%s)
+          if [ -n "$KEEPALIVE_TOKEN" ]; then
+            URL="${KEEPALIVE_URL}?t=${KEEPALIVE_TOKEN}&ts=${TS}"
+          else
+            URL="${KEEPALIVE_URL}?ts=${TS}"
+          fi
+          echo "Pinging: $URL"
           for i in 1 2 3; do
-            http_code=$(curl -sS -o /dev/null -w "%{http_code}" --max-time 20 "$KEEPALIVE_URL") && ok=true || ok=false
+            http_code=$(curl -sS -o /dev/null -w "%{http_code}" \
+              -H "Cache-Control: no-cache" -H "Pragma: no-cache" \
+              --max-time 20 "$URL") && ok=true || ok=false
             echo "Attempt #$i -> HTTP $http_code"
             if $ok && [ "$http_code" -ge 200 ] && [ "$http_code" -lt 500 ]; then
               exit 0
