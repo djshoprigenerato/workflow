@@ -19,8 +19,8 @@ jobs:
     steps:
       - name: Ping Render URL (no-cache + token)
         env:
-          KEEPALIVE_URL: ${{ secrets.KEEPALIVE_URL }}   # es: https://djshoprigenerato.onrender.com/_keepalive
-          KEEPALIVE_TOKEN: ${{ secrets.KEEPALIVE_TOKEN }} # lo stesso impostato su Render
+          KEEPALIVE_URL: ${{ https://www.djshoprigenerato.eu/brands/payments/visa.svg }}   # es: https://djshoprigenerato.onrender.com/_keepalive
+          KEEPALIVE_TOKEN: ${{ cfdd9a03c67cb8426c374d9e3fea6577 }} # lo stesso impostato su Render
         run: |
           if [ -z "$KEEPALIVE_URL" ]; then
             echo "::error ::Missing secret KEEPALIVE_URL"; exit 1
